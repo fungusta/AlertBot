@@ -1,10 +1,14 @@
 package AlertBot.Commands;
 
-import static AlertBot.ResponseUtil.VALID_COMMAND_RESPONSE;
-import static AlertBot.Commands.CommandUtil.REGISTER_COMMAND_MESSAGE;
+import AlertBot.Bot;
+import AlertBot.Group;
+import AlertBot.Storage;
+
+import static AlertBot.Commands.CommandUtil.DUPLICATE_REGISTER_MESSAGE;
+import static AlertBot.Commands.CommandUtil.INVALID_REGISTER_OF_HEAD_GROUP_MESSAGE;
+import static AlertBot.Commands.CommandUtil.REGISTER_COMMAND_SUCCESS_MESSAGE;
 
 public class RegisterCommand extends Command {
-
     private final Long chatId;
 
     public RegisterCommand(Long chatId) {
@@ -12,13 +16,15 @@ public class RegisterCommand extends Command {
     }
 
     @Override
-    public String execute() {
-        //TODO: add the chatID to the google doc
-        return toString() + " " + VALID_COMMAND_RESPONSE;
-    }
-
-    @Override
-    public String toString() {
-        return REGISTER_COMMAND_MESSAGE;
+    public String execute(Bot bot) {
+        Group newGroup = new Group(chatId);
+        if (Storage.contains(newGroup)) {
+            return DUPLICATE_REGISTER_MESSAGE;
+        }
+        if (Bot.isHead(newGroup)) {
+            return INVALID_REGISTER_OF_HEAD_GROUP_MESSAGE;
+        }
+        Storage.addGroup(newGroup);
+        return REGISTER_COMMAND_SUCCESS_MESSAGE;
     }
 }
